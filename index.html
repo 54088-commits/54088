@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刺激點擊遊戲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            overflow: hidden;
+        }
+        .score {
+            font-size: 24px;
+            padding: 20px;
+        }
+        .click-button {
+            position: absolute;
+            font-size: 18px;
+            padding: 15px 25px;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="score">得分: <span id="score">0</span></div>
+    <button class="click-button" id="clickButton">點我!</button>
+
+    <script>
+        let score = 0;
+        let buttonSize = 100; // 初始按鈕寬度
+        const scoreDisplay = document.getElementById('score');
+        const clickButton = document.getElementById('clickButton');
+
+        // 隨機設定按鈕位置
+        function moveButtonRandomly() {
+            const maxWidth = window.innerWidth - clickButton.offsetWidth;
+            const maxHeight = window.innerHeight - clickButton.offsetHeight - 50; // 留出分數欄
+            const randomX = Math.floor(Math.random() * maxWidth);
+            const randomY = Math.floor(Math.random() * maxHeight);
+            clickButton.style.left = randomX + "px";
+            clickButton.style.top = randomY + "px";
+        }
+
+        // 按鈕點擊事件
+        clickButton.addEventListener('click', () => {
+            score++;
+            scoreDisplay.textContent = score;
+
+            // 每次點擊後按鈕變小
+            buttonSize *= 0.9; // 每次縮小10%
+            clickButton.style.width = buttonSize + "px";
+            clickButton.style.height = buttonSize/2 + "px"; // 高度保持比例
+
+            moveButtonRandomly();
+        });
+
+        // 按鈕自動移動（每2秒）
+        setInterval(moveButtonRandomly, 2000);
+
+        // 遊戲開始時初始化按鈕大小和位置
+        clickButton.style.width = buttonSize + "px";
+        clickButton.style.height = buttonSize/2 + "px";
+        moveButtonRandomly();
+    </script>
+</body>
+</html>
