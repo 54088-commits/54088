@@ -1,73 +1,124 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>刺激點擊遊戲</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            overflow: hidden;
-        }
-        .score {
-            font-size: 24px;
-            padding: 20px;
-        }
-        .click-button {
-            position: absolute;
-            font-size: 18px;
-            padding: 15px 25px;
-            background-color: #ff5722;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>輕鬆點擊遊戲｜連點加分</title>
+<style>
+body {
+    margin: 0;
+    background: #f5f5f5;
+    overflow: hidden;
+    font-family: Arial;
+}
+
+.hud {
+    padding: 15px 25px;
+    font-size: 22px;
+}
+
+button {
+    position: absolute;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 15px 30px;
+    transition: transform 0.1s;
+}
+
+button:active {
+    transform: scale(1.1);
+}
+
+.combo {
+    color: #ff5722;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+.game-over {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 32px;
+}
+</style>
 </head>
 <body>
-    <div class="score">得分: <span id="score">0</span></div>
-    <button class="click-button" id="clickButton">點我!</button>
 
-    <script>
-        let score = 0;
-        let buttonSize = 100; // 初始按鈕寬度
-        const scoreDisplay = document.getElementById('score');
-        const clickButton = document.getElementById('clickButton');
+<div class="hud">
+    得分：<span id="score">0</span>
+    <span class="combo">Combo：<span id="combo">0</span></span>
+    時間：<span id="time">30</span>s
+</div>
 
-        // 隨機設定按鈕位置
-        function moveButtonRandomly() {
-            const maxWidth = window.innerWidth - clickButton.offsetWidth;
-            const maxHeight = window.innerHeight - clickButton.offsetHeight - 50; // 留出分數欄
-            const randomX = Math.floor(Math.random() * maxWidth);
-            const randomY = Math.floor(Math.random() * maxHeight);
-            clickButton.style.left = randomX + "px";
-            clickButton.style.top = randomY + "px";
-        }
+<button id="btn">點我 😊</button>
 
-        // 按鈕點擊事件
-        clickButton.addEventListener('click', () => {
-            score++;
-            scoreDisplay.textContent = score;
+<div class="game-over" id="over">
+    <div>遊戲結束</div>
+    <div>你的分數：<span id="final"></span></div>
+    <button onclick="location.reload()">再玩一次</button>
+</div>
 
-            // 每次點擊後按鈕變小
-            buttonSize *= 0.9; // 每次縮小10%
-            clickButton.style.width = buttonSize + "px";
-            clickButton.style.height = buttonSize/2 + "px"; // 高度保持比例
+<script>
+let score = 0;
+let combo = 0;
+let timeLeft = 30;
+let lastClickTime = 0;
 
-            moveButtonRandomly();
-        });
+const btn = document.getElementById('btn');
+const scoreEl = document.getElementById('score');
+const comboEl = document.getElementById('combo');
+const timeEl = document.getElementById('time');
+const over = document.getElementById('over');
+const final = document.getElementById('final');
 
-        // 按鈕自動移動（每2秒）
-        setInterval(moveButtonRandomly, 2000);
+function move() {
+    const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+    const y = Math.random() * (window.innerHeight - btn.offsetHeight - 60);
+    btn.style.left = x + 'px';
+    btn.style.top = y + 'px';
+}
 
-        // 遊戲開始時初始化按鈕大小和位置
-        clickButton.style.width = buttonSize + "px";
-        clickButton.style.height = buttonSize/2 + "px";
-        moveButtonRandomly();
-    </script>
+btn.onclick = () => {
+    const now = Date.now();
+
+    if (now - lastClickTime <= 1000) {
+        combo++;
+    } else {
+        combo = 1;
+    }
+
+    lastClickTime = now;
+
+    score += combo;
+    scoreEl.textContent = score;
+    comboEl.textContent = combo;
+
+    move();
+};
+
+const timer = setInterval(() => {
+    timeLeft--;
+    timeEl.textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+        clearInterval(timer);
+        btn.style.display = 'none';
+        final.textContent = score;
+        over.style.display = 'flex';
+    }
+}, 1000);
+
+move();
+</script>
+
 </body>
 </html>
